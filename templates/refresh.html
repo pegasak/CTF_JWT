@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Refresh Token</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            background-color: #f9f9f9;
+        }
+        h1 {
+            text-align: center;
+        }
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .response {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #fff;
+            overflow-x: auto; /* Добавляем горизонтальную прокрутку */
+            white-space: pre-wrap; /* Перенос текста */
+            word-wrap: break-word; /* Перенос длинных слов */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Refresh Token</h1>
+        <label for="refresh_token">Enter your refresh token:</label>
+        <input type="text" id="refresh_token" placeholder="Paste your refresh token here">
+        <button onclick="refreshToken()">Get New Access Token</button>
+        <div class="response" id="response"></div>
+    </div>
+
+    <script>
+        function refreshToken() {
+            const refreshToken = document.getElementById("refresh_token").value;
+            if (!refreshToken) {
+                alert("Please enter a refresh token.");
+                return;
+            }
+
+            fetch("/refresh", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ refresh_token: refreshToken })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(err => { throw err; });
+                }
+                return response.json();
+            })
+            .then(data => {
+                document.getElementById("response").innerText = "New Access Token: " + data.access_token;
+            })
+            .catch(error => {
+                document.getElementById("response").innerText = `Error: ${error.error || "Unknown error"}`;
+            });
+        }
+    </script>
+</body>
+</html>

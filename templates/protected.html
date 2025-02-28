@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Protected Endpoint</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            background-color: #f9f9f9;
+        }
+        h1 {
+            text-align: center;
+        }
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .response {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Protected Endpoint</h1>
+        <label for="jwt">Enter your JWT token:</label>
+        <input type="text" id="jwt" placeholder="Paste your JWT token here">
+        <button onclick="sendToken()">Submit</button>
+        <div class="response" id="response"></div>
+    </div>
+
+    <script>
+        function sendToken() {
+            const token = document.getElementById("jwt").value;
+            if (!token) {
+                alert("Please enter a JWT token.");
+                return;
+            }
+
+            fetch("/protected", {
+                method: "GET",
+                headers: {
+                    "Authorization": `Bearer ${token}`
+                }
+            })
+            .then(response => {
+                const contentType = response.headers.get("content-type");
+                if (!response.ok) {
+                    if (contentType && contentType.includes("application/json")) {
+                        return response.json().then(err => { throw err; });
+                    }
+                    throw new Error("Unknown error");
+                }
+                return contentType && contentType.includes("application/json") ? response.json() : response.text();
+            })
+            .then(data => {
+                const responseDiv = document.getElementById("response");
+                if (typeof data === "string") {
+                    responseDiv.innerHTML = data;
+                } else {
+                    responseDiv.innerText = JSON.stringify(data, null, 2);
+                }
+            })
+            .catch(error => {
+                document.getElementById("response").innerText = `Error: ${error.error || error.message || "Unknown error"}`;
+            });
+        }
+    </script>
+</body>
+</html>
