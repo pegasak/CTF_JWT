@@ -7,6 +7,5 @@ new_payload = {
   "jti": "...", # новый jti
   "type": "access"
 }
-
 new_token = jwt.encode(new_payload, "найденный вами пароль", algorithm="HS256")
 print(new_token)
