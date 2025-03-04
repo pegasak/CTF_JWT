@@ -8,9 +8,13 @@ services:
     environment:
       - FLASK_ENV=development
       - SECRET_KEY=your_secret_key
-      - DATABASE_URI=sqlite:////app/instance/default.db
+      - DATABASE_URI=sqlite:////app/instance/default.db  # Путь к базе данных
       - ADMIN=!KIRILL!
       - ADMIN_EMAIL=Kirill_admin@gmail.com
       - FLAG=practice{you_are_the_real_admin}  # Флаг задаётся здесь
     volumes:
-      - .:/app
+      - .:/app  # Монтируем текущую директорию в контейнер
+      - db_data:/app/instance  # Том для хранения базы данных
+
+volumes:
+  db_data:  # Определяем том для базы данных
