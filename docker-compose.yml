@@ -10,7 +10,8 @@ services:
       - SECRET_KEY=${SECRET_KEY}
       - DATABASE_URI=sqlite:////app/instance/default.db  # Путь к базе данных
       - ADMIN=${ADMIN}
-      - ADMIN_EMAIL=${ADMIN_PASSWORD}
+      - ADMIN_EMAIL=${ADMIN_EMAIL}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD}
       - FLAG=practice{you_are_the_real_admin}  # Флаг задаётся здесь
     volumes:
       - .:/app  # Монтируем текущую директорию в контейнер
