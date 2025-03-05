@@ -1,14 +1,16 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Refresh Token</title>
+{% extends "base.html" %}
+{% block title %}Refresh Token{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <h1>Refresh Token</h1>
+        <label for="refresh_token">Enter your refresh token:</label>
+        <input type="text" id="refresh_token" placeholder="Paste your refresh token here">
+        <button onclick="refreshToken()">Get New Access Token</button>
+        <div class="response" id="response"></div>
+    </div>
+
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-        }
         .container {
             max-width: 600px;
             margin: 0 auto;
@@ -56,15 +58,6 @@
             word-wrap: break-word; /* Перенос длинных слов */
         }
     </style>
-</head>
-<body>
-    <div class="container">
-        <h1>Refresh Token</h1>
-        <label for="refresh_token">Enter your refresh token:</label>
-        <input type="text" id="refresh_token" placeholder="Paste your refresh token here">
-        <button onclick="refreshToken()">Get New Access Token</button>
-        <div class="response" id="response"></div>
-    </div>
 
     <script>
         function refreshToken() {
@@ -95,5 +88,4 @@
             });
         }
     </script>
-</body>
-</html>
+{% endblock %}

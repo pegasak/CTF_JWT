@@ -1,6 +1,7 @@
 from flask import Flask, redirect, url_for, render_template, request, session, flash, jsonify
 from datetime import timedelta, datetime
 from flask_sqlalchemy import SQLAlchemy
+from werkzeug.security import generate_password_hash, check_password_hash
 import jwt
 import uuid
 import os
@@ -21,12 +22,18 @@ class users(db.Model):
     _id = db.Column("id", db.Integer, primary_key=True)
     name = db.Column(db.String(100))
     email = db.Column(db.String(100))
+    password = db.Column(db.String(200))
     role = db.Column(db.String(15), default="user")
 
-    def __init__(self, name, email, role):
+    def __init__(self, name, email, password, role):
         self.name = name
         self.email = email
+        self.password = generate_password_hash(password)
         self.role = role
+
+    def check_password(self, password):
+        ''' Проверка пароля '''
+        return check_password_hash(self.password, password)
 
 
 class used_tokens(db.Model):
@@ -41,10 +48,11 @@ with app.app_context():
 
     admin_name = os.getenv("ADMIN")
     admin_email = os.getenv("ADMIN_EMAIL")
+    admin_password = os.getenv("ADMIN_PASSWORD")
 
     admin_user = users.query.filter_by(name=admin_name).first()
     if not admin_user:
-        admin_user = users(name=admin_name, email=admin_email, role="admin")
+        admin_user = users(name=admin_name, email=admin_email, password=admin_password, role="admin")
         db.session.add(admin_user)
         db.session.commit()
 
@@ -69,24 +77,25 @@ def home():
 
 @app.route("/login", methods=["POST", "GET"])
 def login():
-    ''' Эндпоинт для авторизации '''
+    """Эндпоинт для авторизации"""
     if request.method == "POST":
         user = request.form["nm"]
+        password = request.form["password"]
         found_user = users.query.filter_by(name=user).first()
 
-        if found_user:
+        if found_user and found_user.check_password(password):
             access_token = create_token(user, found_user.role, 5)
             refresh_token = create_token(user, found_user.role, 1440, is_refresh=True)
             return jsonify({"access_token": access_token, "refresh_token": refresh_token})
         else:
-            flash("User not found!")
+            flash("Invalid username or password")
             return redirect(url_for("login"))
     return render_template("login.html")
 
 
 @app.route("/protected", methods=["GET"])
 def protected():
-    ''' Защищённый ресурс. Доступ имеет только админ '''
+    """Защищённый ресурс. Доступ имеет только админ"""
     auth_header = request.headers.get("Authorization")
     if not auth_header or not auth_header.startswith("Bearer "):
         return render_template("protected.html")
@@ -150,13 +159,14 @@ def register():
     if request.method == "POST":
         username = request.form["nm"]
         email = request.form["email"]
+        password = request.form["password"]
         found_user = users.query.filter_by(name=username).first()
 
         if found_user:
             flash("User already exists!")
             return redirect(url_for("register"))
 
-        new_user = users(name=username, email=email, role="user")
+        new_user = users(name=username, email=email, password=password, role="user")
         db.session.add(new_user)
         db.session.commit()
         flash("Registration successful!")

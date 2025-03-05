@@ -7,10 +7,10 @@ services:
       - "5000:5000"
     environment:
       - FLASK_ENV=development
-      - SECRET_KEY=your_secret_key
+      - SECRET_KEY=${SECRET_KEY}
       - DATABASE_URI=sqlite:////app/instance/default.db  # Путь к базе данных
-      - ADMIN=!KIRILL!
-      - ADMIN_EMAIL=Kirill_admin@gmail.com
+      - ADMIN=${ADMIN}
+      - ADMIN_EMAIL=${ADMIN_PASSWORD}
       - FLAG=practice{you_are_the_real_admin}  # Флаг задаётся здесь
     volumes:
       - .:/app  # Монтируем текущую директорию в контейнер
